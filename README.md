@@ -19,7 +19,7 @@ For more information, please download the `Nhận diện biển số xe.docx` fi
 3. Character Recognition
 
 <p align="center"><img src="https://user-images.githubusercontent.com/40959407/130982072-a4701080-e40d-42c1-8fc5-062da340ca5b.png" width="300"></p>
-<p align="center"><i>Hình 1. Các bước chính trong việc nhận diện </i></p>
+<p align="center"><i>Figure 1. The main stages in the license plate recoginition algorithm </i></p>
 
 ## PHÁT HIỆN VÀ TÁCH BIỂN SỐ:
 **The main stages in detecting and extract the license plate**
@@ -32,25 +32,25 @@ For more information, please download the `Nhận diện biển số xe.docx` fi
 7. Detect the plate by drawing contours and if..else
 
 <p align="center"><img src="https://user-images.githubusercontent.com/40959407/130982322-86cd6ab1-c4de-48c2-b67a-3d52b75be330.jpg" width="300" ></p>
-<p align="center"><i>Hình 2. Xác định và tách biển số </i></p>
+<p align="center"><i>Figure 2. The main stages in detecting and extract the license plate </i></p>
 
 Đầu tiên từ clip ta sẽ cắt từng frame ảnh ra từ clip đầu vào để xử lý, tách biển số. Ở phạm vi đồ án này, ý tưởng chủ yếu là nhận diện được biển số từ sự thay đổi đột ngột về cường độ ánh sáng giữa biển số và môi trường xung quanh nên ta sẽ loại bỏ các dữ liệu màu sắc RGB bằng cách chuyển sang ảnh xám. Tiếp theo ta tăng độ tương phản với hai phép toán hình thái học Top Hat và Black Hat để làm nổi bật thêm biển số giữa phông nền, hỗ trợ cho việc xử lý nhị phân sau này. Sau đó, ta giảm nhiễu bằng bộ lọc Gauss để loại bỏ những chi tiết nhiễu có thể gây ảnh hưởng đến quá trình nhận diện, đồng thời làm tăng tốc độ xử lý.
 
 To analyze and separate the number plate, we will first trim each picture frame from the input footage. The main goal of this project is to detect a license plate based on a quick shift in light intensity between the license plate and the surroundings, thus we'll transform a gray image to remove the RGB color data. Then, using the morphological procedures Top Hat and Black Hat, we raise the contrast to emphasize more number plates in the background, allowing for binary processing later. Then, using a Gaussian filter, we minimize noise and boost processing speed while removing noisy details that might damage the recognition process.
 
-<p align="center"><img src="result/maximize contrast.PNG" width="500" ></p>
-<p align="center"><i>Hình 2. Maximize Contrast </i></p>
+<p align="center"><img src="result/maximize contrast.PNG" width="1000" ></p>
+<p align="center"><i>Figure 3. Maximize Contrast </i></p>
 
 
-Việc lấy ngưỡng sẽ giúp ta tách được thông tin biển số và thông tin nền, ở đây em chọn lấy ngưỡng động (Adaptive Threshold). Tiếp đó ta sử dụng thuật toán phát hiện cạnh Canny để trích xuất những chi tiết cạnh của biển số. Trong quá trình xử lý máy tính có thể nhầm lẫn biển số với những chi tiết nhiễu, việc lọc lần cuối bằng các tỉ lệ cao/rộng hay diện tích của biển số sẽ giúp xác định được đúng biển số. Cuối cùng, ta sẽ xác định vị trí của biển số trong ảnh bằng cách vẽ Contour bao quanh. 
+Việc lấy ngưỡng sẽ giúp ta tách được thông tin biển số và thông tin nền, ở đây chọn lấy ngưỡng động (Adaptive Threshold). Tiếp đó ta sử dụng thuật toán phát hiện cạnh Canny để trích xuất những chi tiết cạnh của biển số. Trong quá trình xử lý máy tính có thể nhầm lẫn biển số với những chi tiết nhiễu, việc lọc lần cuối bằng các tỉ lệ cao/rộng hay diện tích của biển số sẽ giúp xác định được đúng biển số. Cuối cùng, ta sẽ xác định vị trí của biển số trong ảnh bằng cách vẽ Contour bao quanh. 
 
 Using a threshold will assist us distinguish license plate data from background data; in this case, we'll use Adaptive Threshold. After that, we apply the Canny edge detection technique to retrieve the license plate's edge information. The number plate may be confused with noisy features during computer processing; final filtering by high/wide ratios or the license plate area will aid in identifying the proper number plate. Finally, we'll draw a Contour around the number plate in the picture to determine its location.
 
 <p align="center"><img src="result/canny.jpg" width="500" ></p>
-<p align="center"><i>Hình 2. Canny Edge Detection </i></p>
+<p align="center"><i>Figure 4. Canny Edge Detection </i></p>
 
 <p align="center"><img src="result/1.1.jpg" width="200" ></p>
-<p align="center"><i>Hình 2. Drawing contour and extract the information </i></p>
+<p align="center"><i>Figure 5. Drawing contour and extract the information </i></p>
 
 ## Phân tách kí tự:
 **Character segmentation**
@@ -73,14 +73,14 @@ The method to rotate the image I use here is:
 * Rotate the image according to the calculated rotation angle. Otherwise, point A is higher than point B, we give negative rotation angle 
 
 <p align="center"><img src="result/chuaxoay.jpg" width="250" >                      <img src="result/xoay.jpg" width="250" ></p>
-<p align="center"><i>Hình 2. Rotation </i></p>
+<p align="center"><i>Figure 6. Rotation </i></p>
 
 Từ ảnh nhị phân, ta lại tìm contour cho các kí tự (phần màu trắng). Sau đó vẽ những hình chữ nhật bao quanh các kí tự đó. Tuy nhiên việc tìm contour này cũng bị nhiễu dẫn đến việc máy xử lý sai mà tìm ra những hình ảnh không phải kí tự. Ta sẽ áp dụng các đặc điểm về tỉ lệ chiều cao/rộng của kí tự, diện tích của kí tự so với biển số 
 
 The contour for the letters is reconstructed from the binary picture (the white part). Then, around those characters, draw rectangles. However, locating this contour is difficult, resulting in inaccurate outcome and the discovery of non-character objects. We'll use the height/width ratio of the character, as well as the character's area in comparison to the number plate.
 
 <p align="center"><img src="result/character_segment.jpg" width="400" ></p>
-<p align="center"><i>Hình 2. Character Segmentation </i></p>
+<p align="center"><i>Figure 7. Character Segmentation </i></p>
 
 ## Nhận dạng kí tự ##
 **Character Recognition**
@@ -107,36 +107,36 @@ Next, we perform the input of the image we are considering and calculate the dis
 
 
 <p align="center"><img src="result/biển 4.JPG" width="250" >                      <img src="result/biển 5.JPG" width="250" ></p>
-<p align="center"><i>Hình 2. Print out license plate number </i></p>
+<p align="center"><i>Figure 8. Print out license plate number </i></p>
 
 ## Nhận dạng kí tự ##
 **Result**
 
 | Category |	Total number of plates	| Nunmber of found plates | Percentage(%) |
 |:---------------------:|:----------------------:|:-------------------------:|:-------:|
-|1 row plate  |	370     |	182                  |	49,2%           | 
-|2 row plate	| 2349 |	924 |	39,3% |
-<p align="left"><i>Table 2. Percentage of finding the license plate in the picture  </i></p>
+|1 row plate  |	370     |	182                  |	49,2          | 
+|2 row plate	| 2349 |	924 |	39,3 |
+<p align="left"><i>Table 1. Percentage of finding the license plate in the picture  </i></p>
 
 Khi ta quay theo nhiều góc độ, nhiều vị trí dẫn đến khi tính toán diện tích, tỉ lệ cao/rộng của biển số không còn thỏa điều kiện đặt ra nên đã bị loại. Biển số có thể bị ảnh hưởng bởi những chi tiết ngoài nên khi xấp xỉ contour không ra hình tứ giác, dẫn đến cũng gây mất biển số. Lỗi này đặc biệt xảy ra ở những xe ô tô vì ô tô thường có nền xung quanh biển số là những vật liệu phản chiếu ánh sáng mạnh, gây ảnh hưởng lớn đến quá trình xác định vùng biển số. 
 
 When we rotated from many angles, many positions, leading to the calculation of the area, the high / wide ratio of the number plate no longer met the set conditions, so it was eliminated. The number plate can be affected by external details, so the contour approximation does not produce a quadrilateral, leading to the loss of the number plate. This error especially occurs in cars because cars often have a background around the number plate that is strongly reflective materials, which greatly affects the process of determining the number plate area. 
 
-<p align="center"><img src="result/wrong_plates1.jpg" width="250" >                      <img src="result/wrong_plates2.jpg" width="250" ></p>
-<p align="center"><i>Hình 2. Uncorrect plate extraction </i></p>
+<p align="center"><img src="result/wrong_plates1.jpg" width="400" >                      <img src="result/wrong_plates2.jpg" width="400" ></p>
+<p align="center"><i>Figure 9. Uncorrect plate extraction </i></p>
 
 Trong quá trình xử lý, việc xử lý nhị phân cũng đóng vai trò quan trọng, ảnh bị nhiễu và bản thân biển số bị tối, dính nhiều bụi dẫn đến khi xử lý nhị phân sẽ bị đứt đoạn và vẻ contour bị sai, để khắc phục cần sử dụng những phép toán hình thái học như phép nở, phép đóng để làm liền những đường màu trắng trong ảnh nhị phân.
 
 The binary processing is also vital in the processing, the image is noisy, and the number plate itself is dark and dusty, causing the binary processing to be halted. If the contour is incorrect, morphological processes such as open and close must be used to recover white lines in binary pictures.
 
 <p align="center"><img src="result/wrong_plates4.jpg.png" width="250" >                      <img src="result/wrong_plates3.jpg" width="250" ></p>
-<p align="center"><i>Hình 2. Error in binary image </i></p>
+<p align="center"><i>Figure 10. Error in binary image </i></p>
 
 
 |Category|Nunmber of found plates|100% correctly recognizized	| 1-character uncorrect |	2-character uncorrect	| above 3-character uncorrect |
 |:-------:|:---------------------:|:----------------------:|:-------------------------:|:--------------------:|:--------------------:|
 |1 row plates|	182	| 61 |	88 |	19	| 14 |
-|Percentage (%)|      |	33,5 |	48,4 |	10,4	| 7,7 |
+|Percentage (%)|   100   |	33,5 |	48,4 |	10,4	| 7,7 |
 <p align="center"><i>Table 2. Error rate of character recognition in 1 - row license plate </i></p>
 
 
@@ -144,10 +144,10 @@ The binary processing is also vital in the processing, the image is noisy, and t
 |Category|Nunmber of found plates|100% correctly recognizized	| 1-character uncorrect |	2-character uncorrect	| above 3-character uncorrect |
 |:-------:|:---------------------:|:----------------------:|:-------------------------:|:--------------------:|:--------------------:|
 |2 row plates|	924	| 286	| 273 |	175 |	190|
-|Percentage (%)|     |	31 |	29,5 |	18,9	| 20,6|
-<p align="center"><i>Table 2. Error rate of character recognition in 2 - row license plate </i></p>
+|Percentage (%)|   100  |	31 |	29,5 |	18,9	| 20,6|
+<p align="center"><i>Table 3. Error rate of character recognition in 2 - row license plate </i></p>
 
-Nhìn chung mô hình nhận diện KNN cũng khá tốt, có những kí tự dù bị mờ, bị nghiêng vẫn nhận diện đúng. Điều này một phần nhờ vào chương trình đã xoay biển số lại cho để tăng khả năng nhận diện, cho dù nghiêng thì kí tự cũng chỉ nghiêng từ 3° đến 7°.Tuy nhiên vẫn còn nhầm lẫn nhiều giữa các kí tự như số 1 với số 7. Chữ G, chữ D, số 6 với số 0. Chữ B với số 8...
+Nhìn chung mô hình nhận diện KNN cũng khá tốt, có những kí tự dù bị mờ, bị nghiêng vẫn nhận diện đúng. Điều này một phần nhờ vào chương trình đã xoay biển số lại cho để tăng khả năng nhận diện, cho dù nghiêng thì kí tự cũng chỉ nghiêng từ 3° đến 7°. Tuy nhiên vẫn còn nhầm lẫn nhiều giữa các kí tự như số 1 với số 7. Chữ G, chữ D, số 6 với số 0. Chữ B với số 8...
 
 In general, the KNN recognition model is also quite good, there are characters that are recognized correctly even though they are blurred or slanted. This is partly thanks to the program that has rotated the number plate to increase recognition, even if it is tilted, the character will only skew from 3° to 7°. However, there is still a lot of confusion between characters such as numbers. 1 with the number 7. The letter G, the letter D, the number 6 with the number 0. The letter B with the number 8...
 
