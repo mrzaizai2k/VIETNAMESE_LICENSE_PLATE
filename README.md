@@ -1,16 +1,21 @@
 # VIETNAMESE_LICENSE_PLATE using KNN and openCV
 **English below**
+
 Chương trình nhận dạng biển số xe trong kho bãi, được dùng cho biển số xe Việt Nam cả 1 và 2 hàng. Sử dụng xử lý ảnh OpenCV và thuật toán KNN. Chi tiết mình sẽ làm một video youtube cập nhật sau.
 
 This project using the machine learning method called KNN and OpenCV, which is a powerful library for image processing for recognising the Vietnamese license plate in the parking lot. The detail would be in the youtube link below: 
 
 Các bạn có thể tìm hiểu thêm tại [LINK YOUTUBE:](https://youtu.be/7erlCp6d5w8)
 
+**YOUTUBE LINK** above
+
 Đọc file `Nhận diện biển số xe.docx` để biết thêm lý thuyết.
+
 For more information, please download the `Nhận diện biển số xe.docx` file
 
 ## CÁC BƯỚC CHÍNH TRONG CỦA 1 BÀI TOÁN NHẬN DẠNG BIỂN SỐ XE
 **The main stages in the license plate recoginition algorithm**
+
 1. License Plate Detection
 2. Character Segmentation
 3. Character Recognition
@@ -33,12 +38,13 @@ For more information, please download the `Nhận diện biển số xe.docx` fi
 
 Đầu tiên từ clip ta sẽ cắt từng frame ảnh ra từ clip đầu vào để xử lý, tách biển số. Ở phạm vi đồ án này, ý tưởng chủ yếu là nhận diện được biển số từ sự thay đổi đột ngột về cường độ ánh sáng giữa biển số và môi trường xung quanh nên ta sẽ loại bỏ các dữ liệu màu sắc RGB bằng cách chuyển sang ảnh xám. Tiếp theo ta tăng độ tương phản với hai phép toán hình thái học Top Hat và Black Hat để làm nổi bật thêm biển số giữa phông nền, hỗ trợ cho việc xử lý nhị phân sau này. Sau đó, ta giảm nhiễu bằng bộ lọc Gauss để loại bỏ những chi tiết nhiễu có thể gây ảnh hưởng đến quá trình nhận diện, đồng thời làm tăng tốc độ xử lý.
 
-Việc lấy ngưỡng sẽ giúp ta tách được thông tin biển số và thông tin nền, ở đây em chọn lấy ngưỡng động (Adaptive Threshold). Tiếp đó ta sử dụng thuật toán phát hiện cạnh Canny để trích xuất những chi tiết cạnh của biển số. Trong quá trình xử lý máy tính có thể nhầm lẫn biển số với những chi tiết nhiễu, việc lọc lần cuối bằng các tỉ lệ cao/rộng hay diện tích của biển số sẽ giúp xác định được đúng biển số. Cuối cùng, ta sẽ xác định vị trí của biển số trong ảnh bằng cách vẽ Contour bao quanh. 
-
 To analyze and separate the number plate, we will first trim each picture frame from the input footage. The main goal of this project is to detect a license plate based on a quick shift in light intensity between the license plate and the surroundings, thus we'll transform a gray image to remove the RGB color data. Then, using the morphological procedures Top Hat and Black Hat, we raise the contrast to emphasize more number plates in the background, allowing for binary processing later. Then, using a Gaussian filter, we minimize noise and boost processing speed while removing noisy details that might damage the recognition process.
 
 <p align="center"><img src="result/maximize contrast.PNG" width="500" ></p>
 <p align="center"><i>Hình 2. Maximize Contrast </i></p>
+
+
+Việc lấy ngưỡng sẽ giúp ta tách được thông tin biển số và thông tin nền, ở đây em chọn lấy ngưỡng động (Adaptive Threshold). Tiếp đó ta sử dụng thuật toán phát hiện cạnh Canny để trích xuất những chi tiết cạnh của biển số. Trong quá trình xử lý máy tính có thể nhầm lẫn biển số với những chi tiết nhiễu, việc lọc lần cuối bằng các tỉ lệ cao/rộng hay diện tích của biển số sẽ giúp xác định được đúng biển số. Cuối cùng, ta sẽ xác định vị trí của biển số trong ảnh bằng cách vẽ Contour bao quanh. 
 
 Using a threshold will assist us distinguish license plate data from background data; in this case, we'll use Adaptive Threshold. After that, we apply the Canny edge detection technique to retrieve the license plate's edge information. The number plate may be confused with noisy features during computer processing; final filtering by high/wide ratios or the license plate area will aid in identifying the proper number plate. Finally, we'll draw a Contour around the number plate in the picture to determine its location.
 
@@ -75,16 +81,38 @@ Từ ảnh nhị phân, ta lại tìm contour cho các kí tự (phần màu tr�
 
 The contour for the letters is reconstructed from the binary picture (the white part). Then, around those characters, draw rectangles. However, locating this contour is difficult, resulting in inaccurate outcome and the discovery of non-character objects. We'll use the height/width ratio of the character, as well as the character's area in comparison to the number plate.
 
+<p align="center"><img src="result/character_segment.jpg" width="400" ></p>
+<p align="center"><i>Hình 2. Character Segmentation </i></p>
+
+## Nhận dạng kí tự ##
+**Character Recognition**
+
+KNN là một trong những thuật toán học có giám sát đơn giản nhất trong Machine Learning, hoạt động theo quy trình gồm 4 bước chính:
+1.	Xác định tham số K (số láng giềng gần nhất). 
+2.	Tính khoảng cách từ điểm đang xét đến tất cả các điểm trong tập dữ liệu cho trước
+3.	Sắp xếp các khoảng cách đó theo thứ tự tăng dần
+4.	Xét trong tập K điểm gần nhất với điểm đang xét, nếu số lượng điểm của loại nào cao hơn thì coi như điểm đang xét thuộc loại đó
+
+KNN is one of the simplest supervised learning algorithms in Machine Learning, operating in a 4-step process:
+1. Determine the parameter K (number of nearest neighbors).
+2. Calculate the distance from the point in question to all points in the given data set
+3. Sort those distances in ascending order
+4. Considering in the set K the closest point to the point under consideration, if the number of points of any kind is higher, it is considered that the point under consideration belongs to that type.
+
+Vì mỗi kí tự có kích thước khác nhau xử lý phức tạp nên cần chuẩn hóa hình ảnh lại với kích thước cao:rộng là 30:20 pixels. Thay vì mỗi kí tự đưa vào mô hình để máy nhận diện thì những kí tự này sẽ được ta gắn nhãn bằng những phím bấm trên máy tính. Sau khi gắn nhãn hết các kí tự ta sẽ lưu hai file `.txt` là `classifications.txt` và `flattened_images.txt`. File `classifications.txt` có nhiệm vụ lưu các mã ASCII của các kí tự đó và file `flattened_images.txt` sẽ lưu giá trị các điểm ảnh có trong hình ảnh kí tự (hình 20x30 pixel có tổng cộng 600 điểm ảnh có giá trị 0 hoặc 255)
+
+Tiếp đó ta thực hiện đưa ảnh đang xét vào và tính khoảng cách đến tất cả các điểm trong mẫu, kết quả sẽ là mã ASCII đại điện cho hình ảnh đó. Cuối cùng ta in biển số xe ra hình. 
+
+Because each letter is variable in size, the processing is more difficult, thus the picture must be normalized with a height: width ratio of 30:20 pixels. Instead of each character being entered into the model for the system to identify, the keys on the computer will label these characters. We'll save two '.txt' files as 'classifications.txt' and 'flattened images.txt' once we've labeled all the characters. The ASCII codes of those characters are stored in the file classifications.txt, while the values of the pixels in the character image are stored in the file flattened images.txt (20x30 pixel image has a total of 600 pixels worth of pixels, a value of 0 or a value of 255)
+
+Next, we perform the input of the image we are considering and calculate the distances to all points in the sample, the result will be the ASCII code representing that image. Finally, we print out the license plate number.
 
 
+<p align="center"><img src="result/biển 4.JPG" width="250" >                      <img src="result/biển 5.JPG" width="250" ></p>
+<p align="center"><i>Hình 2. Print out license plate number </i></p>
 
-
-
-
-
-
-
-
+## Nhận dạng kí tự ##
+**Result**
 
 
 
