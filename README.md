@@ -122,20 +122,69 @@ Khi ta quay theo nhiều góc độ, nhiều vị trí dẫn đến khi tính to
 
 When we rotated from many angles, many positions, leading to the calculation of the area, the high / wide ratio of the number plate no longer met the set conditions, so it was eliminated. The number plate can be affected by external details, so the contour approximation does not produce a quadrilateral, leading to the loss of the number plate. This error especially occurs in cars because cars often have a background around the number plate that is strongly reflective materials, which greatly affects the process of determining the number plate area. 
 
+<p align="center"><img src="result/wrong_plates1.jpg" width="250" >                      <img src="result/wrong_plates2.jpg" width="250" ></p>
+<p align="center"><i>Hình 2. Uncorrect plate extraction </i></p>
+
 Trong quá trình xử lý, việc xử lý nhị phân cũng đóng vai trò quan trọng, ảnh bị nhiễu và bản thân biển số bị tối, dính nhiều bụi dẫn đến khi xử lý nhị phân sẽ bị đứt đoạn và vẻ contour bị sai, để khắc phục cần sử dụng những phép toán hình thái học như phép nở, phép đóng để làm liền những đường màu trắng trong ảnh nhị phân.
 
 The binary processing is also vital in the processing, the image is noisy, and the number plate itself is dark and dusty, causing the binary processing to be halted. If the contour is incorrect, morphological processes such as open and close must be used to recover white lines in binary pictures.
 
+<p align="center"><img src="result/wrong_plates4.jpg.png" width="250" >                      <img src="result/wrong_plates3.jpg" width="250" ></p>
+<p align="center"><i>Hình 2. Error in binary image </i></p>
+
+
 |Category|Nunmber of found plates|100% correctly recognizized	| 1-character uncorrect |	2-character uncorrect	| above 3-character uncorrect |
 |:-------:|:---------------------:|:----------------------:|:-------------------------:|:--------------------:|:--------------------:|
 |1 row plates|	182	| 61 |	88 |	19	| 14 |
-|Percentage (%)|	33,5 |	48,4 |	10,4	| 7,7 |
+|Percentage (%)|      |	33,5 |	48,4 |	10,4	| 7,7 |
 <p align="center"><i>Table 2. Error rate of character recognition in 1 - row license plate </i></p>
+
+
 
 |Category|Nunmber of found plates|100% correctly recognizized	| 1-character uncorrect |	2-character uncorrect	| above 3-character uncorrect |
 |:-------:|:---------------------:|:----------------------:|:-------------------------:|:--------------------:|:--------------------:|
 |2 row plates|	924	| 286	| 273 |	175 |	190|
-|Percentage (%)|	31 |	29,5 |	18,9	| 20,6|
+|Percentage (%)|     |	31 |	29,5 |	18,9	| 20,6|
 <p align="center"><i>Table 2. Error rate of character recognition in 2 - row license plate </i></p>
+
+Nhìn chung mô hình nhận diện KNN cũng khá tốt, có những kí tự dù bị mờ, bị nghiêng vẫn nhận diện đúng. Điều này một phần nhờ vào chương trình đã xoay biển số lại cho để tăng khả năng nhận diện, cho dù nghiêng thì kí tự cũng chỉ nghiêng từ 3° đến 7°.Tuy nhiên vẫn còn nhầm lẫn nhiều giữa các kí tự như số 1 với số 7. Chữ G, chữ D, số 6 với số 0. Chữ B với số 8...
+
+In general, the KNN recognition model is also quite good, there are characters that are recognized correctly even though they are blurred or slanted. This is partly thanks to the program that has rotated the number plate to increase recognition, even if it is tilted, the character will only skew from 3° to 7°. However, there is still a lot of confusion between characters such as numbers. 1 with the number 7. The letter G, the letter D, the number 6 with the number 0. The letter B with the number 8...
+
+## Đánh giá và hướng phát triển
+**Conclusion and future work**
+
+### Ưu điểm  
+**Advantages:**
+
+* Dễ cài đặt và sử dụng.
+* Khá nhẹ nên máy tính với cấu hình yếu cũng có thể xử lý mượt mà so với các thuật toán khác như CNN, SVM.
+*	Phù hợp cho đối tượng sinh viên muốn tìm hiểu căn bản về xử lý ảnh hay trí tuệ nhân tạo.
+
+* Easy to install and apply.
+* Quite light, computers with weak configuration can also handle smoothly compared to other algorithms such as CNN, SVM.
+* Suitable for students who want to learn the basics of image processing or artificial intelligence. 
+
+### Khuyết điểm  
+**Disadvantages:**
+
+*	Khả năng nhận diện của KNN còn thấp, khi tập dữ liệu quá nhiều sẽ tăng thời gian xử lý vì phải quét hết tập dữ liệu train.
+*	Nhận diện kém với sự phản chiếu của biển số, sự di ảnh, chói sáng từ môi trường ngoài, những biển có phần chữ số không rõ ràng, với biển số xe ô tô 
+
+* The recognition ability of KNN is still low, when the data set is too large, the processing time will increase because it has to scan the entire train dataset.
+* Poor recognition with the reflection of the license plate, the movement of the image, the glare from the outside environment, the plates with unclear digits, with the license plate of the car 
+
+### Hướng phát triển 
+**Future Work:**
+
+* Cần thay đổi thuật toán nhận diện KNN sang những thuật toán khác tinh vi và phức tạp hơn như CNN, SVM hoặc có thể sử dụng những bộ thư viện đã có sẵn trên thế giới như YOLO, YOLOv3...
+* Sử dụng camera chuyên dụng cho việc nhận diện biển số xe vì có khả năng chống chịu với sương mù, đêm tối, chói sáng...
+* Sử dụng các thuật toán xử lý ảnh khác để xác định vị trí biển số tốt hơn như phương pháp biến đổi Hough để nhận diện đường thẳng, xác định bằng màu sắc, những thuật toán làm hạn chế sự di ảnh khi xe đang di chuyển.
+
+* It is necessary to change the KNN recognition algorithm to other more sophisticated and complex algorithms such as CNN, SVM or can use existing libraries in the world such as YOLO, YOLOv3...
+* Use a dedicated camera for license plate recognition because it is resistant to fog, dark night, glare...
+* Use other image processing algorithms to better determine license plate position such as Hough transform method for line recognition, color identification, algorithms that limit image movement when the vehicle is moving. 
+
+
 
 
