@@ -7,8 +7,6 @@ This project using the machine learning method called KNN and OpenCV, which is a
 
 Các bạn có thể tìm hiểu thêm tại [LINK YOUTUBE:](https://youtu.be/7erlCp6d5w8)
 
-**YOUTUBE LINK** above
-
 Đọc file `Nhận diện biển số xe.docx` để biết thêm lý thuyết.
 
 For more information, please download the `Nhận diện biển số xe.docx` file
@@ -114,7 +112,30 @@ Next, we perform the input of the image we are considering and calculate the dis
 ## Nhận dạng kí tự ##
 **Result**
 
+| Category |	Total number of plates	| Nunmber of found plates | Percentage(%) |
+|:---------------------:|:----------------------:|:-------------------------:|:-------:|
+|1 row plate  |	370     |	182                  |	49,2%           | 
+|2 row plate	| 2349 |	924 |	39,3% |
+<p align="left"><i>Table 2. Percentage of finding the license plate in the picture  </i></p>
 
+Khi ta quay theo nhiều góc độ, nhiều vị trí dẫn đến khi tính toán diện tích, tỉ lệ cao/rộng của biển số không còn thỏa điều kiện đặt ra nên đã bị loại. Biển số có thể bị ảnh hưởng bởi những chi tiết ngoài nên khi xấp xỉ contour không ra hình tứ giác, dẫn đến cũng gây mất biển số. Lỗi này đặc biệt xảy ra ở những xe ô tô vì ô tô thường có nền xung quanh biển số là những vật liệu phản chiếu ánh sáng mạnh, gây ảnh hưởng lớn đến quá trình xác định vùng biển số. 
 
+When we rotated from many angles, many positions, leading to the calculation of the area, the high / wide ratio of the number plate no longer met the set conditions, so it was eliminated. The number plate can be affected by external details, so the contour approximation does not produce a quadrilateral, leading to the loss of the number plate. This error especially occurs in cars because cars often have a background around the number plate that is strongly reflective materials, which greatly affects the process of determining the number plate area. 
+
+Trong quá trình xử lý, việc xử lý nhị phân cũng đóng vai trò quan trọng, ảnh bị nhiễu và bản thân biển số bị tối, dính nhiều bụi dẫn đến khi xử lý nhị phân sẽ bị đứt đoạn và vẻ contour bị sai, để khắc phục cần sử dụng những phép toán hình thái học như phép nở, phép đóng để làm liền những đường màu trắng trong ảnh nhị phân.
+
+The binary processing is also vital in the processing, the image is noisy, and the number plate itself is dark and dusty, causing the binary processing to be halted. If the contour is incorrect, morphological processes such as open and close must be used to recover white lines in binary pictures.
+
+|Category|Nunmber of found plates|100% correctly recognizized	| 1-character uncorrect |	2-character uncorrect	| above 3-character uncorrect |
+|:-------:|:---------------------:|:----------------------:|:-------------------------:|:--------------------:|:--------------------:|
+|1 row plates|	182	| 61 |	88 |	19	| 14 |
+|Percentage (%)|	33,5 |	48,4 |	10,4	| 7,7 |
+<p align="center"><i>Table 2. Error rate of character recognition in 1 - row license plate </i></p>
+
+|Category|Nunmber of found plates|100% correctly recognizized	| 1-character uncorrect |	2-character uncorrect	| above 3-character uncorrect |
+|:-------:|:---------------------:|:----------------------:|:-------------------------:|:--------------------:|:--------------------:|
+|2 row plates|	924	| 286	| 273 |	175 |	190|
+|Percentage (%)|	31 |	29,5 |	18,9	| 20,6|
+<p align="center"><i>Table 2. Error rate of character recognition in 2 - row license plate </i></p>
 
 
