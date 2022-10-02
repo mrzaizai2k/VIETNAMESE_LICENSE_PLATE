@@ -5,7 +5,17 @@ Chương trình nhận dạng biển số xe trong kho bãi, được dùng cho 
 
 This project using the machine learning method called KNN and OpenCV, which is a powerful library for image processing for recognising the Vietnamese license plate in the parking lot. The detail would be in the youtube link below: 
 
+HOW TO USE:
+* To test on image, run `Image_test2.py`. Remember to change the path of image in `data/image/`
+* To test on video, run `Video_test2.py`. Remeber to record the video with size 1920x1080 
+* Use `GenData.py` to generate KNN data points which is `classifications.txt` and `flattened_images.txt`
+* `training_chars.png` is the input of `GenData.py`
+* `Preprocess.py` contains functions for image processing
+* Remember to set up neccesary libraries in `requirements.txt` 
+
 Các bạn có thể tìm hiểu thêm tại [LINK YOUTUBE:](https://youtu.be/7erlCp6d5w8)
+
+More about this project on [YOUTUBE:](https://youtu.be/7erlCp6d5w8)
 
 Đọc file `Nhận diện biển số xe.docx` để biết thêm lý thuyết.
 
