@@ -1,0 +1,23 @@
+preprocess:
+  GAUSSIAN_SMOOTH_FILTER_SIZE: [5, 5]      # kích cỡ càng to thì càng mờ
+  ADAPTIVE_THRESH_BLOCK_SIZE: 19
+  ADAPTIVE_THRESH_WEIGHT: 9
+
+image:
+  resize: [1920, 1080]
+
+preprocess:
+  GAUSSIAN_SMOOTH_FILTER_SIZE: [5, 5]
+  ADAPTIVE_THRESH_BLOCK_SIZE: 19
+  ADAPTIVE_THRESH_WEIGHT: 9
+
+plate:
+  Min_char: 0.01
+  Max_char: 0.09
+  RESIZED_IMAGE_WIDTH: 20
+  RESIZED_IMAGE_HEIGHT: 30
+
+model:
+  classifications_path: "classifications.txt"
+  flattened_images_path: "flattened_images.txt"
+  k_value: 3
