@@ -38,24 +38,22 @@ def is_file(path:str):
     return '.' in path
 
 def check_path(path):
-    # Extract the last element from the path
-    last_element = os.path.basename(path)
-    if is_file(last_element):
-        # If it's a file, get the directory part of the path
-        folder_path = os.path.dirname(path)
-
-        # Check if the directory exists, create it if not
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-            print(f"Create new folder path: {folder_path}")
-        return path
+    """
+    Ensure the directory part of the given path exists.
+    Works whether the path points to a file or a directory.
+    """
+    # If the path looks like a file (has an extension)
+    if os.path.splitext(path)[1]:
+        folder_path = os.path.dirname(path) or "."
     else:
-        # If it's not a file, it's a directory path
-        # Check if the directory exists, create it if not
-        if not os.path.exists(path):
-            os.makedirs(path)
-            print(f"Create new path: {path}")
-        return path
+        folder_path = path
+
+    # Create the folder if it doesn't exist
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        print(f"📁 Created new folder: {folder_path}")
+
+    return path
 
 def read_config(path = 'config/config.yaml'):
     with open(path, 'r') as file:

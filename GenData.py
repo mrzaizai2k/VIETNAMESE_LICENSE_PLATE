@@ -1,103 +1,131 @@
-# GenData.py
-
-import numpy as np
-import cv2
 import sys
+sys.path.append("")
+
+import os
+import cv2
+import numpy as np
+from utils import read_config, check_path
 
 
-# module level variables ##########################################################################
-MIN_CONTOUR_AREA = 40
+# ------------------------------------------------------------------------------------------------
+def preprocess_training_image(config, img_path="training_chars.png"):
+    """Read and preprocess training image."""
+    img = cv2.imread(img_path)
+    if img is None:
+        raise FileNotFoundError(f"❌ Cannot find training image: {img_path}")
+
+    imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur_size = tuple(config["preprocess"]["GAUSSIAN_SMOOTH_FILTER_SIZE"])
+    imgBlurred = cv2.GaussianBlur(imgGray, blur_size, 0)
+
+    block_size = config["preprocess"]["ADAPTIVE_THRESH_BLOCK_SIZE"]
+    weight = config["preprocess"]["ADAPTIVE_THRESH_WEIGHT"]
+    imgThresh = cv2.adaptiveThreshold(
+        imgBlurred,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY_INV,
+        block_size,
+        weight
+    )
+    return img, imgThresh
 
 
-RESIZED_IMAGE_WIDTH = 20
-RESIZED_IMAGE_HEIGHT = 30
+# ------------------------------------------------------------------------------------------------
+def save_training_data(config, npaClassifications, npaFlattenedImages):
+    """Save or append new labeled data to existing training files."""
+    if npaClassifications.size == 0:
+        print("⚠️ No new data to save.")
+        return
 
-###################################################################################################
-def main():
-    imgTrainingNumbers = cv2.imread("training_chars.png")            # read in training numbers image
-    #imgTrainingNumbers = cv2.resize(imgTrainingNumbers, dsize = None, fx = 0.5, fy = 0.5)
+    class_path = config["model"]["classifications_path"]
+    flat_path = config["model"]["flattened_images_path"]
+
+    check_path(class_path)
+    check_path(flat_path)
     
-    imgGray = cv2.cvtColor(imgTrainingNumbers, cv2.COLOR_BGR2GRAY)          # get grayscale image
-    imgBlurred = cv2.GaussianBlur(imgGray, (5,5), 0)                        # blur
+    if os.path.exists(class_path) and os.path.exists(flat_path):
+        print("📂 Existing training files found — appending new data...")
+        old_classes = np.loadtxt(class_path, np.float32)
+        old_flatten = np.loadtxt(flat_path, np.float32)
 
-                                                        # filter image from grayscale to black and white
-    imgThresh = cv2.adaptiveThreshold(imgBlurred,                           # input image
-                                      255,                                  # make pixels that pass the threshold full white
-                                      cv2.ADAPTIVE_THRESH_GAUSSIAN_C,       # use gaussian rather than mean, seems to give better results
-                                      cv2.THRESH_BINARY_INV,                # invert so foreground will be white, background will be black
-                                      11,                                   # size of a pixel neighborhood used to calculate threshold value
-                                      2)                                    # constant subtracted from the mean or weighted mean
+        old_classes = old_classes.reshape((old_classes.size, 1))
+        new_classes = np.vstack((old_classes, npaClassifications.reshape((npaClassifications.size, 1))))
+        new_flatten = np.vstack((old_flatten, npaFlattenedImages))
 
-    cv2.imshow("imgThresh", imgThresh)      # show threshold image for reference
+        np.savetxt(class_path, new_classes)
+        np.savetxt(flat_path, new_flatten)
+    else:
+        print("🆕 No existing data found — creating new training files...")
+        np.savetxt(class_path, npaClassifications.reshape((npaClassifications.size, 1)))
+        np.savetxt(flat_path, npaFlattenedImages)
 
-    imgThreshCopy = imgThresh.copy()        # make a copy of the thresh image, this in necessary b/c findContours modifies the image
+    print(f"💾 Saved {len(npaClassifications)} new samples to:")
+    print(f"   - {class_path}")
+    print(f"   - {flat_path}")
 
-    npaContours, hierarchy = cv2.findContours(imgThreshCopy,        # input image, make sure to use a copy since the function will modify this image in the course of finding contours
-                                                 cv2.RETR_EXTERNAL,                 # retrieve the outermost contours only
-                                                 cv2.CHAIN_APPROX_SIMPLE)           # compress horizontal, vertical, and diagonal segments and leave only their end points
 
-                                # declare empty numpy array, we will use this to write to file later
-                                # zero rows, enough cols to hold all image data
-    npaFlattenedImages =  np.empty((0, RESIZED_IMAGE_WIDTH * RESIZED_IMAGE_HEIGHT))
-   
+# ------------------------------------------------------------------------------------------------
+def collect_training_data(config, imgTrainingNumbers, imgThresh):
+    """Manually label characters and build flattened image dataset."""
+    MIN_CONTOUR_AREA = 40
+    RESIZED_IMAGE_WIDTH = config["plate"]["RESIZED_IMAGE_WIDTH"]
+    RESIZED_IMAGE_HEIGHT = config["plate"]["RESIZED_IMAGE_HEIGHT"]
 
-    intClassifications = []         # declare empty classifications list, this will be our list of how we are classifying our chars from user input, we will write to file at the end
+    imgThreshCopy = imgThresh.copy()
+    npaContours, hierarchy = cv2.findContours(
+        imgThreshCopy,
+        cv2.RETR_EXTERNAL,
+        cv2.CHAIN_APPROX_SIMPLE
+    )
 
-                                    # possible chars we are interested in are digits 0 through 9, put these in list intValidChars
-    intValidChars = [ord('0'), ord('1'), ord('2'), ord('3'), ord('4'), ord('5'), ord('6'), ord('7'), ord('8'), ord('9'),
-                     ord('A'), ord('B'), ord('C'), ord('D'), ord('E'), ord('F'), ord('G'), ord('H'), ord('I'), ord('J'),
-                     ord('K'), ord('L'), ord('M'), ord('N'), ord('O'), ord('P'), ord('Q'), ord('R'), ord('S'), ord('T'),
-                     ord('U'), ord('V'), ord('W'), ord('X'), ord('Y'), ord('Z')] #Là mã ascii của mấy chữ này
+    npaFlattenedImages = np.empty((0, RESIZED_IMAGE_WIDTH * RESIZED_IMAGE_HEIGHT))
+    intClassifications = []
+    intValidChars = [ord(c) for c in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"]
 
-    for npaContour in npaContours:                          # for each contour
-        if cv2.contourArea(npaContour) > MIN_CONTOUR_AREA:          # if contour is big enough to consider
-            [intX, intY, intW, intH] = cv2.boundingRect(npaContour)         # get and break out bounding rect
+    print("💡 Tip: Press ESC anytime to stop and auto-save progress.\n")
 
-                                                # draw rectangle around each contour as we ask user for input
-            cv2.rectangle(imgTrainingNumbers,           # draw rectangle on original training image
-                          (intX, intY),                 # upper left corner
-                          (intX+intW,intY+intH),        # lower right corner
-                          (0, 0, 255),                  # red
-                          2)                            # thickness
+    for i, npaContour in enumerate(npaContours):
+        if cv2.contourArea(npaContour) > MIN_CONTOUR_AREA:
+            [x, y, w, h] = cv2.boundingRect(npaContour)
 
-            imgROI = imgThresh[intY:intY+intH, intX:intX+intW]                                  # crop char out of threshold image
-            imgROIResized = cv2.resize(imgROI, (RESIZED_IMAGE_WIDTH, RESIZED_IMAGE_HEIGHT))     # resize image, this will be more consistent for recognition and storage
+            cv2.rectangle(imgTrainingNumbers, (x, y), (x+w, y+h), (0, 0, 255), 2)
+            imgROI = imgThresh[y:y+h, x:x+w]
+            imgROIResized = cv2.resize(imgROI, (RESIZED_IMAGE_WIDTH, RESIZED_IMAGE_HEIGHT))
 
-            cv2.imshow("imgROI", imgROI)                    # show cropped out char for reference
-            cv2.imshow("imgROIResized", imgROIResized)      # show resized image for reference
-            
-            cv2.imshow("training_numbers.png", imgTrainingNumbers)      # show training numbers image, this will now have red rectangles drawn on it
+            cv2.imshow("ROI", imgROI)
+            cv2.imshow("Resized ROI", imgROIResized)
+            cv2.imshow("Training Image", imgTrainingNumbers)
 
-            intChar = cv2.waitKey(0)                     # get key press
+            intChar = cv2.waitKey(0)
 
-            if intChar == 27:                   # if esc key was pressed
-                sys.exit()                      # exit program
-            elif intChar in intValidChars:      # else if the char is in the list of chars we are looking for . . .
+            if intChar == 27:  # ESC pressed
+                print("\n👋 Exit requested by user. Saving progress...")
+                # Save everything collected so far before exiting
+                npaClassifications_np = np.array(intClassifications, np.float32)
+                save_training_data(config, npaClassifications_np, npaFlattenedImages)
+                cv2.destroyAllWindows()
+                sys.exit(0)
 
-                intClassifications.append(intChar)        # append classification char to integer list of chars (we will convert to float later before writing to file)
-                #Là file chứa label của tất cả các ảnh mẫu, tổng cộng có 32 x 5 = 160 mẫu.
-                npaFlattenedImage = imgROIResized.reshape((1, RESIZED_IMAGE_WIDTH * RESIZED_IMAGE_HEIGHT))  # flatten image to 1d numpy array so we can write to file later
-                
-                npaFlattenedImages = np.append(npaFlattenedImages, npaFlattenedImage, 0)                    # add current flattened impage numpy array to list of flattened image numpy arrays
-                
-            # end if
-        # end if
-    # end for
+            elif intChar in intValidChars:
+                intClassifications.append(intChar)
+                npaFlattenedImage = imgROIResized.reshape((1, RESIZED_IMAGE_WIDTH * RESIZED_IMAGE_HEIGHT))
+                npaFlattenedImages = np.append(npaFlattenedImages, npaFlattenedImage, 0)
 
-    fltClassifications = np.array(intClassifications, np.float32)                   # convert classifications list of ints to numpy array of floats
-    
-    npaClassifications = fltClassifications.reshape((fltClassifications.size, 1))   # flatten numpy array of floats to 1d so we can write to file later
+    cv2.destroyAllWindows()
 
-    print ("\n\ntraining complete !!\n")
+    print(f"\n✅ Collected {len(intClassifications)} samples.\n")
+    return np.array(intClassifications, np.float32), npaFlattenedImages
 
-    np.savetxt("classifications.txt", npaClassifications)           # write flattened images to file
-    np.savetxt("flattened_images.txt", npaFlattenedImages)          #
 
-    cv2.destroyAllWindows()             # remove windows from memory
-
-    return
-
-###################################################################################################
+# ------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
-    main()
-# end if
+    config = read_config("config/config.yaml")
+
+    imgTrainingNumbers, imgThresh = preprocess_training_image(config)
+    cv2.imshow("Thresholded", imgThresh)
+
+    npaClassifications, npaFlattenedImages = collect_training_data(config, imgTrainingNumbers, imgThresh)
+
+    # Save at the end (in case user didn’t press ESC)
+    save_training_data(config, npaClassifications, npaFlattenedImages)
