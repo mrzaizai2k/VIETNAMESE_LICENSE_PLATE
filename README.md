@@ -3,6 +3,9 @@ Check out my 2 YOUTUBE channels for more:
 1. [Mrzaizai2k - AI](https://www.youtube.com/channel/UCFGCVG0P2eLS5jkDaE0vSfA) (NEW)
 2. [Mrzaizai2k](https://www.youtube.com/channel/UCCq3lQ1W437euT9eq2_26HQ) (old)
 
+This **master** branch contains the same code shown in my YouTube videos.
+If you’re looking for the **refactored version** — which includes a website to manage license plates — please switch to the **refactor** branch.
+
 **English below**
 
 Chương trình nhận dạng biển số xe trong kho bãi, được dùng cho biển số xe Việt Nam cả 1 và 2 hàng. Sử dụng xử lý ảnh OpenCV và thuật toán KNN. Chi tiết mình sẽ làm một video youtube cập nhật sau.
