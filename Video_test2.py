@@ -35,7 +35,7 @@ kNearest = cv2.ml.KNearest_create()  # instantiate KNN object
 kNearest.train(npaFlattenedImages, cv2.ml.ROW_SAMPLE, npaClassifications)
 
 # Read video
-cap = cv2.VideoCapture('data/video/haihang.mp4')
+cap = cv2.VideoCapture('data/video/video1.mp4')
 while (cap.isOpened()):
 
     # Image preprocessing
