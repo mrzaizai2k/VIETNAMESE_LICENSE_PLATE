@@ -1,0 +1,73 @@
+.manage-container {
+  text-align: center;
+  padding: 2rem;
+  color: #eee;
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  min-height: 100vh;
+}
+
+.empty-msg {
+  color: #aaa;
+  margin-top: 2rem;
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.record-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.record-image {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.record-text {
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  resize: none;
+  text-align: center;
+}
+
+.record-time {
+  font-size: 0.9rem;
+  color: #00c2ff;
+  margin: 0.5rem 0;
+}
+
+.record-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.record-actions button {
+  background: #00c2ff;
+  border: none;
+  color: white;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.record-actions button:hover {
+  background: #0096cc;
+}

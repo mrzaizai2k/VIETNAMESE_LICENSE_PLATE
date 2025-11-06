@@ -165,7 +165,7 @@ def extract_plate_and_characters(img, imgGray, imgThresh, screenCnt, kNearest, c
 
         # Step 3: segmentation
         thre_mor, contours = segment_characters(imgThreshCrop)
-        cv2.imshow(str(plate_id + 20), thre_mor)
+        # cv2.imshow(str(plate_id + 20), thre_mor)
 
         # Step 4: filter
         char_x, char_x_ind = filter_characters(contours, roi, config)
@@ -175,7 +175,7 @@ def extract_plate_and_characters(img, imgGray, imgThresh, screenCnt, kNearest, c
 
         print(f"\n License Plate {plate_id}: {first_line} - {second_line}\n")
         roi = cv2.resize(roi, None, fx=0.75, fy=0.75)
-        cv2.imshow(str(plate_id), cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
+        # cv2.imshow(str(plate_id), cv2.cvtColor(roi, cv2.COLOR_BGR2RGB))
 
         # 🟢 Collect and return results
         results.append({
@@ -187,27 +187,41 @@ def extract_plate_and_characters(img, imgGray, imgThresh, screenCnt, kNearest, c
 
     return results
 
+def load_image_from_path(img_path):
+    """Load an image from a given path and apply preprocessing."""
+    if not os.path.exists(img_path):
+        print(f"⚠️ Image not found: {img_path}")
+        return None
 
-# ======================= DETECTION PIPELINE =========================
-def detect_license_plate(config, img_path, show_steps=False):
-    """Main detection pipeline."""
-    kNearest = load_knn_model(config)
     img = cv2.imread(img_path)
+    if img is None:
+        print(f"⚠️ Failed to read image from {img_path}")
+        return None
+
+    return img
+
+
+def detect_license_plate(config, img, show_steps=False):
+    """Main detection pipeline (input is cv2 image)."""
+    kNearest = load_knn_model(config)
     img, imgGray, imgThresh, dilated_image = preprocess_image(img, config)
 
-    # 🟢 Receive both screenCnt and annotated image
+    # 🟢 Find contours of possible plates
     screenCnt, img = find_license_plate_contours(img, dilated_image)
-    detected = 1 if len(screenCnt) > 0 else 0
+    detected = len(screenCnt) > 0
 
     if not detected:
         print("No plate detected")
-        return None
+        return []
 
-    # 🟢 Receive extracted results
+    # 🟢 Extract plates and recognized characters
     results = extract_plate_and_characters(img, imgGray, imgThresh, screenCnt, kNearest, config)
 
-    img = cv2.resize(img, None, fx=0.5, fy=0.5)
+    # 🟢 Sort results: longest text first
+    results = sorted(results, key=lambda x: len(x["text"]), reverse=True)
+
     if show_steps:
+        img = cv2.resize(img, None, fx=0.5, fy=0.5)
         cv2.imshow("License plate", img)
         cv2.waitKey(0)
 
@@ -217,12 +231,16 @@ def detect_license_plate(config, img_path, show_steps=False):
 # ======================= TEST ENTRY POINT ==========================
 if __name__ == "__main__":
     img_path = "data/image/10.jpg"
-    if not os.path.exists(img_path):
-        print(f"⚠️ Image not found: {img_path}")
-        sys.exit(1)
-
     config_path = "config/config.yaml"
     config = read_config(config_path)
 
-    results = detect_license_plate(config, img_path, show_steps=True)
+    # Step 1️⃣: Load image
+    img = load_image_from_path(img_path)
+    if img is None:
+        sys.exit(1)
+
+    # Step 2️⃣: Detect license plates
+    results = detect_license_plate(config, img, show_steps=False)
     print("Final Results:", results)
+
+

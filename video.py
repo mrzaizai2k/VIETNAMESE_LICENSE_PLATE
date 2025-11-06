@@ -64,14 +64,15 @@ def process_video(config, video_path, show_steps=False):
                 total_detected += 1
 
                 # Draw result on frame
+                x, y, w, h = cv2.boundingRect(cnt)
                 cv2.putText(
                     img,
                     text,
-                    (10, 40),
+                    (x+30, y - 10),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     1.2,
                     (0, 255, 255),
-                    3,
+                    2,
                     cv2.LINE_AA,
                 )
 
@@ -106,7 +107,7 @@ if __name__ == "__main__":
     config = read_config(config_path)
 
     # Input video
-    video_path = "data/video/haihang.mp4"
+    video_path = "data/video/video3.mp4"
 
     # Run
     process_video(config, video_path, show_steps=True)

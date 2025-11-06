@@ -59,6 +59,7 @@ def create_test_data(folder):
     return data
 
 if __name__ == "__main__":
+    print(ord('8'))
     config = read_config("config/config.yaml")
     folder = "data/characters"
     data = create_test_data(folder)

@@ -1,0 +1,91 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+.home-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 60px);
+  background: linear-gradient(135deg, #0a0f1f, #0e1a2b, #102b4a);
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+  padding: 2rem;
+}
+
+.hero-section {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 3rem 4rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.hero-section:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+}
+
+.icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: #00bfff;
+  margin-bottom: 1.2rem;
+  text-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+}
+
+.course {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  color: #dbe9ff;
+}
+
+.course span {
+  font-weight: 600;
+  color: #60a9ff;
+}
+
+.students {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.students p {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  color: #9ec9ff;
+}
+
+.students ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 2px solid #00bfff;
+  padding-left: 1rem;
+}
+
+.students li {
+  font-size: 1rem;
+  color: #e0eaff;
+  margin: 0.3rem 0;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease;
+}
+
+.students li:hover {
+  color: #00bfff;
+}

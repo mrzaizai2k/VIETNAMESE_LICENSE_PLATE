@@ -1,0 +1,110 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+.inference-container {
+  font-family: "Poppins", sans-serif;
+  color: #e8f0ff;
+  padding: 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #0a0f1f, #0e1a2b, #102b4a);
+  min-height: calc(100vh - 60px);
+}
+
+h2 {
+  font-size: 2rem;
+  color: #00bfff;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+}
+
+.file-input {
+  margin: 1rem 0 2rem 0;
+  background: none;
+  border: 2px dashed #00bfff;
+  color: #00bfff;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-input:hover {
+  background: rgba(0, 191, 255, 0.1);
+}
+
+.inference-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.video-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.video-section video {
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.video-section button {
+  margin-top: 1.2rem;
+  background: #00bfff;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+}
+
+.video-section button:hover {
+  background: #0096cc;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.5);
+}
+
+/* Result Section (Right Side) */
+.result-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2rem;
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  width: 500px;
+  transition: transform 0.3s ease;
+}
+
+.result-section:hover {
+  transform: translateY(-3px);
+}
+
+.result-text {
+  font-size: 1.2rem;
+  color: #9ec9ff;
+  margin-bottom: 0.5rem;
+}
+
+.result-time {
+  font-size: 0.95rem;
+  color: #80bfff;
+  margin-bottom: 1rem;
+  font-style: italic;
+  text-shadow: 0 0 6px rgba(0, 191, 255, 0.3);
+}
+
+.result-image {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 191, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}

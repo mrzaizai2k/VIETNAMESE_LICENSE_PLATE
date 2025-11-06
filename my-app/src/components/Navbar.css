@@ -1,0 +1,55 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+.navbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  background: linear-gradient(90deg, #0a0f1f, #0e1a2b, #102b4a);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+  font-family: "Poppins", sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Navbar buttons */
+.navbar button {
+  background: none;
+  border: none;
+  color: #cfd8ff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding-bottom: 0.3rem;
+  position: relative;
+}
+
+/* Subtle glowing underline effect */
+.navbar button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background: #00bfff;
+  box-shadow: 0 0 8px #00bfff;
+  transition: width 0.3s ease;
+}
+
+.navbar button:hover {
+  color: #00bfff;
+  transform: translateY(-1px);
+}
+
+.navbar button:hover::after,
+.navbar button.active::after {
+  width: 100%;
+}
+
+.navbar button.active {
+  color: #00bfff;
+}
