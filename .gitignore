@@ -1,5 +1,4 @@
 *.pyc
 *.docx
 .vscode/
-*.mp4
 my-app/src/data/
