@@ -1,6 +1,115 @@
 .train-container {
   text-align: center;
   padding: 2rem;
-  color: #555;
+  color: #eee;
   font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #0a0f1f, #0e1a2b, #102b4a);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-input {
+  margin-top: 1rem;
+  background: #00c2ff;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  border: none;
+}
+
+.file-input:hover {
+  background: #0096cc;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  max-width: 1000px;
+}
+
+.image-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 180px;
+  text-align: center;
+}
+
+.preview-img {
+  width: auto;
+  height: 150px; /* ✅ same height for all */
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.label-input {
+  width: 100%;
+  border: none;
+  border-radius: 6px;
+  padding: 0rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.label-input::placeholder {
+  color: #aaa;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: rgba(255, 0, 0, 0.7);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  width: 25px;
+  height: 25px;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+
+.remove-btn:hover {
+  background: rgba(255, 0, 0, 0.9);
+}
+
+.train-btn {
+  margin-top: 2rem;
+  background: #00c2ff;
+  border: none;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.train-btn:hover {
+  background: #0096cc;
+}
+
+.train-msg {
+  margin-top: 1.5rem;
+  color: #00c2ff;
+  font-weight: 500;
+}
+
+.empty-msg {
+  color: #aaa;
+  margin-top: 2rem;
 }
