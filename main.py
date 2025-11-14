@@ -1,13 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-import base64
-import cv2
-import numpy as np
-from plate_recognition import detect_license_plate
-from utils import read_config
-from GenData2 import create_knn_data_from_rgb  # ✅ import function
+
+import os
 import uvicorn
+
+from plate_recognition import detect_license_plate
+from utils import read_config, write_config, base64_to_cv2, cv2_to_base64, merge_dict
+from GenData2 import create_knn_data_from_rgb
 
 # ================== CONFIG ==================
 HOST = "0.0.0.0"
@@ -26,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+# ================== SCHEMAS ==================
 class ImageData(BaseModel):
     image_base64: str
 
@@ -40,17 +40,13 @@ class TrainRequest(BaseModel):
     data: list[TrainImage]
 
 
-def base64_to_cv2(base64_str):
-    img_data = base64.b64decode(base64_str.split(",")[-1])
-    np_arr = np.frombuffer(img_data, np.uint8)
-    return cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+class UpdateConfig(BaseModel):
+    data: dict   # nested partial update allowed
 
 
-def cv2_to_base64(img):
-    _, buffer = cv2.imencode(".jpg", img)
-    return "data:image/jpeg;base64," + base64.b64encode(buffer).decode("utf-8")
+# ================== ENDPOINTS ==================
 
-
+# ----------- Recognize Plate -----------
 @app.post("/recognize/")
 async def recognize_plate(data: ImageData):
     img = base64_to_cv2(data.image_base64)
@@ -61,30 +57,79 @@ async def recognize_plate(data: ImageData):
 
     output = []
     for r in results:
-        encoded_img = cv2_to_base64(r["roi"])
         output.append({
             "plate_id": r["plate_id"],
             "text": r["text"],
-            "image": encoded_img
+            "image": cv2_to_base64(r["roi"])
         })
 
     return {"status": "ok", "results": output}
 
 
-# ✅ NEW ENDPOINT: Train KNN from uploaded labeled images
+# ----------- Train KNN -----------
 @app.post("/train/")
 async def train_model(req: TrainRequest):
     try:
-        data = []
+        dataset = []
         for item in req.data:
             img = base64_to_cv2(item.image_base64)
-            data.append((img, item.label.strip().upper()))
-        success = create_knn_data_from_rgb(config, data, show=False)
+            dataset.append((img, item.label.strip().upper()))
+
+        success = create_knn_data_from_rgb(config, dataset, show=False)
         return {"status": "ok" if success else "fail"}
+
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
 
+# ----------- Get Config -----------
+@app.get("/config/")
+async def get_config():
+    return {"status": "ok", "config": read_config(CONFIG_PATH)}
+
+
+# ----------- Update Config -----------
+@app.put("/config/")
+async def update_config(req: UpdateConfig):
+    try:
+        cfg = read_config(CONFIG_PATH)
+        merge_dict(cfg, req.data)
+        write_config(CONFIG_PATH, cfg)
+
+        global config
+        config = read_config(CONFIG_PATH)
+
+        return {"status": "ok", "updated": cfg}
+
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+# ----------- Training Info -----------
+@app.get("/training-info/")
+async def training_info():
+    model_cfg = config["model"]
+    cls_path = model_cfg["classifications_path"]
+    flat_path = model_cfg["flattened_images_path"]
+
+    def count_lines(path):
+        if not os.path.exists(path):
+            return 0
+        with open(path, "r") as f:
+            return sum(1 for _ in f)
+
+    return {
+        "status": "ok",
+        "samples": count_lines(cls_path),
+        "images": count_lines(flat_path),
+        "paths": {
+            "classifications": cls_path,
+            "flattened_images": flat_path
+        }
+    }
+
+
+# ================== RUN ==================
 if __name__ == "__main__":
-    print(f"🚀 Running backend on http://{HOST}:{PORT}")
+    print(f"🚀 Backend running at http://{HOST}:{PORT}")
     uvicorn.run(app, host=HOST, port=PORT)

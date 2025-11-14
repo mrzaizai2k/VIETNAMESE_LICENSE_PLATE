@@ -7,6 +7,7 @@ import os
 import yaml
 import numpy as np
 import cv2
+import base64
 
         
 def convert_ms_to_hms(ms):
@@ -59,6 +60,31 @@ def read_config(path = 'config/config.yaml'):
     with open(path, 'r') as file:
         data = yaml.safe_load(file)
     return data
+
+
+def write_config(path, data):
+    with open(path, "w", encoding="utf-8") as file:
+        yaml.safe_dump(data, file, allow_unicode=True)
+
+def base64_to_cv2(base64_str: str):
+    img_bytes = base64.b64decode(base64_str.split(",")[-1])
+    np_arr = np.frombuffer(img_bytes, np.uint8)
+    return cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+
+def cv2_to_base64(img):
+    _, buffer = cv2.imencode(".jpg", img)
+    return "data:image/jpeg;base64," + base64.b64encode(buffer).decode("utf-8")
+
+
+def merge_dict(a, b):
+    """Recursively merge dictionary b into dictionary a"""
+    for k, v in b.items():
+        if isinstance(v, dict) and k in a:
+            merge_dict(a[k], v)
+        else:
+            a[k] = v
+
 
 def load_knn_model(config):
     """Load KNN model for character recognition"""

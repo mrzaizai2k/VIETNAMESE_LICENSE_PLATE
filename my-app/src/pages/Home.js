@@ -14,9 +14,9 @@ const Home = () => {
         <div className="students">
           <p>Sinh viên:</p>
           <ul>
-            <li>Mai Chí Bảo</li>
-            <li>Nguyễn Hoàng Long</li>
-            <li>Huỳnh Nhật Anh</li>
+            <li>Mai Chí Bảo - 2370691</li>
+            <li>Nguyễn Hoàng Long - 2570247</li>
+            <li>Huỳnh Nhật Anh - 2370689</li>
           </ul>
         </div>
       </div>

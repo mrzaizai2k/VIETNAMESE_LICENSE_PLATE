@@ -1,13 +1,93 @@
-.train-container {
-  text-align: center;
-  padding: 2rem;
-  color: #eee;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #0a0f1f, #0e1a2b, #102b4a);
+/* ============ Global Container ============ */
+.train-app {
+  display: flex;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f1f, #0e1a2b, #102b4a);
+  font-family: "Poppins", sans-serif;
+  color: #eee;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0f1f, #0e1a2b, #102b4a);
+  color: #00c2ff;
+  font-size: 1.5rem;
+}
+
+/* ============ Sidebar ============ */
+.sidebar {
+  width: 265px;
+  background: rgba(0, 0, 0, 0.3);
+  border-right: 2px solid rgba(0, 194, 255, 0.3);
+  padding: 2rem 0;
+}
+
+.sidebar-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #00c2ff;
+}
+
+.sidebar-nav {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+}
+
+.nav-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s;
+  text-align: left;
+}
+
+.nav-btn.active {
+  background: #00c2ff;
+}
+
+.nav-btn:hover {
+  background: rgba(0, 194, 255, 0.5);
+}
+
+.sample-counter {
+  margin: 2rem 1rem;
+  padding: 1rem;
+  background: rgba(0, 194, 255, 0.1);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.counter-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #00c2ff;
+}
+
+.counter-label {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-top: 0.3rem;
+}
+
+/* ============ Main Content ============ */
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* ============ Train Tab ============ */
+.train-tab {
+  text-align: center;
 }
 
 .file-input {
@@ -17,12 +97,17 @@
   padding: 0.6rem 1rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s;
   border: none;
+  transition: background 0.3s;
 }
 
 .file-input:hover {
   background: #0096cc;
+}
+
+.empty-msg {
+  color: #aaa;
+  margin-top: 2rem;
 }
 
 .image-grid {
@@ -32,6 +117,8 @@
   gap: 1.5rem;
   margin-top: 2rem;
   max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .image-card {
@@ -46,7 +133,7 @@
 
 .preview-img {
   width: auto;
-  height: 150px; /* ✅ same height for all */
+  height: 150px;
   object-fit: contain;
   border-radius: 8px;
   margin-bottom: 0.5rem;
@@ -57,7 +144,7 @@
   width: 100%;
   border: none;
   border-radius: 6px;
-  padding: 0rem;
+  padding: 0.5rem;
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   text-align: center;
@@ -103,13 +190,184 @@
   background: #0096cc;
 }
 
+.train-btn.disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
 .train-msg {
   margin-top: 1.5rem;
   color: #00c2ff;
   font-weight: 500;
 }
 
-.empty-msg {
+/* ============ Config Tab ============ */
+.config-tab {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.config-description {
   color: #aaa;
-  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.config-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  color: #00c2ff;
+  margin-bottom: 1rem;
+}
+
+.config-field {
+  margin-bottom: 1rem;
+}
+
+.config-field:last-child {
+  margin-bottom: 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #aaa;
+}
+
+.config-input {
+  flex: 1;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.config-input.full-width {
+  width: 50%;
+}
+
+.dual-input {
+  display: flex;
+  gap: 1rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.save-config-btn {
+  width: 100%;
+  background: #00c2ff;
+  border: none;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.save-config-btn:hover {
+  background: #0096cc;
+}
+
+.config-msg {
+  margin-top: 1rem;
+  color: #00c2ff;
+  text-align: center;
+}
+
+/* ============ Metrics Tab ============ */
+.metrics-tab {
+}
+
+.metrics-description {
+  color: #aaa;
+  margin-bottom: 2rem;
+}
+
+.chart-container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.chart-title {
+  color: #00c2ff;
+  margin-bottom: 1rem;
+}
+
+.k-value-info {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.k-value-info .highlight {
+  color: #00c2ff;
+  font-weight: bold;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.metric-card.accuracy {
+  background: rgba(0, 194, 255, 0.1);
+}
+
+.metric-card.precision {
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.metric-card.recall {
+  background: rgba(255, 107, 107, 0.1);
+}
+
+.metric-card.f1 {
+  background: rgba(255, 217, 61, 0.1);
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.metric-card.accuracy .metric-value {
+  color: #00c2ff;
+}
+
+.metric-card.precision .metric-value {
+  color: #00ff88;
+}
+
+.metric-card.recall .metric-value {
+  color: #ff6b6b;
+}
+
+.metric-card.f1 .metric-value {
+  color: #ffd93d;
+}
+
+.metric-label {
+  color: #aaa;
+  margin-top: 0.5rem;
 }
