@@ -12,11 +12,13 @@ const TrainWithBackend = () => {
   const [trainingInfo, setTrainingInfo] = useState({ samples: 0, images: 0 });
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [kValueComparison, setKValueComparison] = useState([]);
 
   // Fetch config and training info on mount
   useEffect(() => {
     fetchConfig();
     fetchTrainingInfo();
+    fetchEvaluation();
   }, []);
 
   const fetchConfig = async () => {
@@ -34,6 +36,25 @@ const TrainWithBackend = () => {
     }
   };
 
+  const fetchEvaluation = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/evaluate/`);
+      const data = await response.json();
+      if (data.status === "ok") {
+        const perfData = data.results?.map((item) => ({
+          k: item.k,
+          accuracy: parseFloat(item.accuracy),
+          precision: parseFloat(item.precision),
+          recall: parseFloat(item.recall),
+          f1Score: parseFloat(item.f1),
+        }));
+        setKValueComparison(perfData || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch evaluation:", error);
+    }
+  };
+
   const fetchTrainingInfo = async () => {
     try {
       const response = await fetch(`${API_BASE}/training-info/`);
@@ -45,38 +66,6 @@ const TrainWithBackend = () => {
       console.error("Failed to fetch training info:", error);
     }
   };
-
-  // Generate fake metrics data based on training samples
-  const generateMetricsData = () => {
-    const count = trainingInfo.samples || 120;
-    const points = [];
-    for (let i = 20; i <= count; i += Math.max(10, Math.floor(count / 10))) {
-      const accuracy = 0.65 + (i / count) * 0.3 + (Math.random() * 0.03 - 0.015);
-      const precision = 0.62 + (i / count) * 0.32 + (Math.random() * 0.03 - 0.015);
-      const recall = 0.60 + (i / count) * 0.33 + (Math.random() * 0.03 - 0.015);
-      const f1Score = 2 * (precision * recall) / (precision + recall);
-      
-      points.push({
-        samples: i,
-        accuracy: (accuracy * 100).toFixed(2),
-        precision: (precision * 100).toFixed(2),
-        recall: (recall * 100).toFixed(2),
-        f1Score: (f1Score * 100).toFixed(2)
-      });
-    }
-    return points;
-  };
-
-  const metricsData = generateMetricsData();
-
-  // K-value performance comparison
-  const kValueComparison = [
-    { k: 1, accuracy: 87.5, time: 45 },
-    { k: 3, accuracy: 92.3, time: 52 },
-    { k: 5, accuracy: 91.8, time: 68 },
-    { k: 7, accuracy: 89.2, time: 85 },
-    { k: 9, accuracy: 87.1, time: 102 }
-  ];
 
   // Handle multi-file upload
   const handleUpload = (e) => {
@@ -133,6 +122,7 @@ const TrainWithBackend = () => {
         setMessage("✅ Training completed successfully!");
         setImages([]);
         await fetchTrainingInfo();
+        await fetchEvaluation(); // Refresh metrics after training
       } else {
         setMessage(`⚠️ Training failed: ${result.message || "Unknown error"}`);
       }
@@ -233,6 +223,7 @@ const TrainWithBackend = () => {
 
       {/* Main Content */}
       <div className="main-content">
+        {/* Train Tab */}
         {activeTab === "train" && (
           <div className="train-tab">
             <h2>🧠 Train Model</h2>
@@ -288,6 +279,7 @@ const TrainWithBackend = () => {
           </div>
         )}
 
+        {/* Config Tab */}
         {activeTab === "config" && (
           <div className="config-tab">
             <h2>⚙️ Configuration</h2>
@@ -453,45 +445,13 @@ const TrainWithBackend = () => {
           </div>
         )}
 
+        {/* Metrics Tab */}
         {activeTab === "metrics" && (
           <div className="metrics-tab">
             <h2>📊 KNN Performance Metrics</h2>
             <p className="metrics-description">
               Training performance analysis with {trainingInfo.samples} samples
             </p>
-
-            {/* Performance Over Time */}
-            <div className="chart-container">
-              <h3 className="chart-title">
-                Performance vs Training Samples
-              </h3>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={metricsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis 
-                    dataKey="samples" 
-                    stroke="#aaa"
-                    label={{ value: 'Training Samples', position: 'insideBottom', offset: -5, fill: '#aaa' }}
-                  />
-                  <YAxis 
-                    stroke="#aaa"
-                    label={{ value: 'Performance (%)', angle: -90, position: 'insideLeft', fill: '#aaa' }}
-                  />
-                  <Tooltip 
-                    contentStyle={{ 
-                      background: 'rgba(10, 15, 31, 0.95)', 
-                      border: '1px solid rgba(0, 194, 255, 0.3)',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Legend />
-                  <Line type="monotone" dataKey="accuracy" stroke="#00c2ff" strokeWidth={2} name="Accuracy" />
-                  <Line type="monotone" dataKey="precision" stroke="#00ff88" strokeWidth={2} name="Precision" />
-                  <Line type="monotone" dataKey="recall" stroke="#ff6b6b" strokeWidth={2} name="Recall" />
-                  <Line type="monotone" dataKey="f1Score" stroke="#ffd93d" strokeWidth={2} name="F1 Score" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
 
             {/* K-Value Comparison */}
             <div className="chart-container">
@@ -511,6 +471,7 @@ const TrainWithBackend = () => {
                     label={{ value: 'Accuracy (%)', angle: -90, position: 'insideLeft', fill: '#aaa' }}
                   />
                   <Tooltip 
+                    formatter={(value) => `${(value * 100).toFixed(2)}%`}
                     contentStyle={{ 
                       background: 'rgba(10, 15, 31, 0.95)', 
                       border: '1px solid rgba(0, 194, 255, 0.3)',
@@ -523,39 +484,47 @@ const TrainWithBackend = () => {
               </ResponsiveContainer>
               <p className="k-value-info">
                 Current K-value: <span className="highlight">{config.model.k_value}</span>
-                {" "}(Accuracy: {kValueComparison.find(k => k.k === config.model.k_value)?.accuracy || "N/A"}%)
+                {" "}(Accuracy: {kValueComparison.find(k => k.k === config.model.k_value) ? 
+                    (kValueComparison.find(k => k.k === config.model.k_value).accuracy * 100).toFixed(2) 
+                    : "N/A"}%)
               </p>
             </div>
 
             {/* Metrics Summary Cards */}
             <div className="metrics-grid">
-              <div className="metric-card accuracy">
-                <div className="metric-value">
-                  {metricsData[metricsData.length - 1]?.accuracy || "0.00"}%
-                </div>
-                <div className="metric-label">Current Accuracy</div>
-              </div>
-              
-              <div className="metric-card precision">
-                <div className="metric-value">
-                  {metricsData[metricsData.length - 1]?.precision || "0.00"}%
-                </div>
-                <div className="metric-label">Precision</div>
-              </div>
-              
-              <div className="metric-card recall">
-                <div className="metric-value">
-                  {metricsData[metricsData.length - 1]?.recall || "0.00"}%
-                </div>
-                <div className="metric-label">Recall</div>
-              </div>
-              
-              <div className="metric-card f1">
-                <div className="metric-value">
-                  {metricsData[metricsData.length - 1]?.f1Score || "0.00"}%
-                </div>
-                <div className="metric-label">F1 Score</div>
-              </div>
+              {kValueComparison.length > 0 ? (
+                <>
+                  <div className="metric-card accuracy">
+                    <div className="metric-value">
+                      {(kValueComparison.find(k => k.k === config.model.k_value)?.accuracy * 100 || 0).toFixed(2)}%
+                    </div>
+                    <div className="metric-label">Accuracy</div>
+                  </div>
+
+                  <div className="metric-card precision">
+                    <div className="metric-value">
+                      {(kValueComparison.find(k => k.k === config.model.k_value)?.precision * 100 || 0).toFixed(2)}%
+                    </div>
+                    <div className="metric-label">Precision</div>
+                  </div>
+
+                  <div className="metric-card recall">
+                    <div className="metric-value">
+                      {(kValueComparison.find(k => k.k === config.model.k_value)?.recall * 100 || 0).toFixed(2)}%
+                    </div>
+                    <div className="metric-label">Recall</div>
+                  </div>
+
+                  <div className="metric-card f1">
+                    <div className="metric-value">
+                      {(kValueComparison.find(k => k.k === config.model.k_value)?.f1Score * 100 || 0).toFixed(2)}%
+                    </div>
+                    <div className="metric-label">F1 Score</div>
+                  </div>
+                </>
+              ) : (
+                <p>No evaluation data yet. Run training first.</p>
+              )}
             </div>
           </div>
         )}

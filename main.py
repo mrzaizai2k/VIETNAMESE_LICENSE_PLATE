@@ -8,6 +8,8 @@ import uvicorn
 from plate_recognition import detect_license_plate
 from utils import read_config, write_config, base64_to_cv2, cv2_to_base64, merge_dict
 from GenData2 import create_knn_data_from_rgb
+from evaluate import evaluate_knn_range
+
 
 # ================== CONFIG ==================
 HOST = "0.0.0.0"
@@ -128,6 +130,12 @@ async def training_info():
         }
     }
 
+# ----------- Get Evaluation Metrics -----------
+@app.get("/evaluate/")
+async def get_evaluation():
+    K_VALUES = [1, 3, 5, 7, 9]
+    result = evaluate_knn_range(config, K_VALUES)
+    return result
 
 # ================== RUN ==================
 if __name__ == "__main__":
